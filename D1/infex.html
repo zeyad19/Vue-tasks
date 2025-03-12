@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Books App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            background-color: #f4f4f4;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            transition: transform 0.2s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .card img {
+            height: 220px;
+            object-fit: cover;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .wishlist-table {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        .btn-add {
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+        }
+        .btn-add:hover {
+            background-color: #0056b3;
+        }
+        .btn-remove {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 5px;
+        }
+        .btn-remove:hover {
+            background-color: #b52b37;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container mt-5">
+        <h1 class="text-center mb-4">📚 Book Collection</h1>
+
+        <ul class="list-group mb-4">
+            <li v-for="book in books" :key="book.ISBN" class="list-group-item d-flex justify-content-between align-items-center">
+                {{ book.name }} 
+                <span class="text-muted"><strong>By :</strong> {{ book.author }}</span>
+            </li>
+        </ul>
+
+        <div class="row">
+            <div v-for="book in books" :key="book.ISBN" class="col-md-3 mb-4">
+                <div class="card">
+                    <img :src="book.image" class="card-img-top" alt="Book Image">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ book.name }}</h5>
+                        <p class="text-muted"><strong>Author:</strong> {{ book.author }}</p>
+                        <p class="text-muted"><strong>Category:</strong> {{ book.category }}</p>
+                        <p><strong>Pages:</strong> {{ book.pages }}</p>
+                        <p><strong>Price:</strong> {{ formatPrice(book.price) }}</p>
+                        <button class="btn btn-add w-100" @click="addToWishlist(book)">Add to Wishlist</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-success mt-4 w-100" @click="showWishlist = !showWishlist">
+            {{ showWishlist ? "Hide Wishlist" : "Show Wishlist" }}
+        </button>
+
+        <div v-if="showWishlist" class="mt-4 wishlist-table">
+            <h3 class="text-center">Your Wishlist</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Author</th>
+                        <th>Price</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(book, index) in wishlist" :key="book.ISBN">
+                        <td>{{ book.name }}</td>
+                        <td>{{ book.author }}</td>
+                        <td>{{ formatPrice(book.price) }}</td>
+                        <td>
+                            <button class="btn btn-remove btn-sm" @click="removeFromWishlist(index)">Remove</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    books: [
+                        { ISBN: "12345", name: "One", category: "Fiction", image: "./images/1.jpg", pages: 45, author: "Naguib Mahfouz", price: 100 },
+                        { ISBN: "67890", name: "Two", category: "Sci-Fi", image: "./images/2.jpg", pages: 120, author: "Taha Hussein", price: 150 },
+                        { ISBN: "11121", name: "Three", category: "History", image: "./images/3.jpg", pages: 30, author: "Yusuf Idris", price: 80 },
+                        { ISBN: "22232", name: "Four", category: "Mystery", image: "./images/4.jpg", pages: 200, author: "Naguib Mahfouz", price: 180 },
+                        { ISBN: "33343", name: "Five", category: "Romance", image: "./images/1.jpg", pages: 90, author: "Edwar al-Kharrat", price: 120 },
+                        { ISBN: "44454", name: "Six", category: "Horror", image: "./images/2.jpg", pages: 150, author: "Ahmed Khaled Tawfik", price: 200 },
+                        { ISBN: "55565", name: "Seven", category: "Adventure", image: "./images/3.jpg", pages: 70, author: "Naguib Mahfouz", price: 140 },
+                        { ISBN: "66676", name: "Eight", category: "Biography", image: "./images/4.jpg", pages: 300, author: "Ahmed Khaled Tawfik", price: 220 }
+                    ],
+                    wishlist: [],
+                    showWishlist: false
+                };
+            },
+            methods: {
+                addToWishlist(book) {
+                    if (!this.wishlist.find(item => item.ISBN === book.ISBN)) {
+                        this.wishlist.push(book);
+                    }
+                },
+                removeFromWishlist(index) {
+                    this.wishlist.splice(index, 1);
+                },
+                formatPrice(price) {
+                    return new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(price);
+                }
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>
